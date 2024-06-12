@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Setup</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Setup Game</h1>
+        <form id="setupForm">
+            <label for="numPlayers">Number of Players:</label>
+            <input type="number" id="numPlayers" name="numPlayers" min="1" required>
+            <br><br>
+            <label for="numItems">Number of Items:</label>
+            <input type="number" id="numItems" name="numItems" min="1" required>
+            <br><br>
+            <div id="playerNames"></div>
+            <div id="itemNames"></div>
+            <button type="submit">Submit</button>
+        </form>
+    </div>
+
+    <script>
+        const setupForm = document.getElementById('setupForm');
+        setupForm.addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const numPlayers = document.getElementById('numPlayers').value;
+            const numItems = document.getElementById('numItems').value;
+
+            const playerNames = [];
+            for (let i = 1; i <= numPlayers; i++) {
+                const playerName = document.getElementById('playerName' + i).value;
+                playerNames.push(playerName);
+            }
+
+            const itemNames = [];
+            for (let i = 1; i <= numItems; i++) {
+                const itemName = document.getElementById('itemName' + i).value;
+                itemNames.push(itemName);
+            }
+
+            localStorage.setItem('numPlayers', numPlayers);
+            localStorage.setItem('numItems', numItems);
+            localStorage.setItem('playerNames', JSON.stringify(playerNames));
+            localStorage.setItem('itemNames', JSON.stringify(itemNames));
+
+            window.location.href = 'game.html';
+        });
+
+        document.getElementById('numPlayers').addEventListener('change', updatePlayerInputs);
+        document.getElementById('numItems').addEventListener('change', updateItemInputs);
+
+        function updatePlayerInputs() {
+            const numPlayers = document.getElementById('numPlayers').value;
+            const playerNamesDiv = document.getElementById('playerNames');
+            playerNamesDiv.innerHTML = '';
+            for (let i = 1; i <= numPlayers; i++) {
+                const label = document.createElement('label');
+                label.for = 'playerName' + i;
+                label.textContent = 'Player ' + i + ' Name:';
+                playerNamesDiv.appendChild(label);
+
+                const input = document.createElement('input');
+                input.type = 'text';
+                input.id = 'playerName' + i;
+                input.name = 'playerName' + i;
+                input.required = true;
+                playerNamesDiv.appendChild(input);
+
+                playerNamesDiv.appendChild(document.createElement('br'));
+                playerNamesDiv.appendChild(document.createElement('br'));
+            }
+        }
+
+        function updateItemInputs() {
+            const numItems = document.getElementById('numItems').value;
+            const itemNamesDiv = document.getElementById('itemNames');
+            itemNamesDiv.innerHTML = '';
+            for (let i = 1; i <= numItems; i++) {
+                const label = document.createElement('label');
+                label.for = 'itemName' + i;
+                label.textContent = 'Item ' + i + ' Name:';
+                itemNamesDiv.appendChild(label);
+
+                const input = document.createElement('input');
+                input.type = 'text';
+                input.id = 'itemName' + i;
+                input.name = 'itemName' + i;
+                input.required = true;
+                itemNamesDiv.appendChild(input);
+
+                itemNamesDiv.appendChild(document.createElement('br'));
+                itemNamesDiv.appendChild(document.createElement('br'));
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sealed Bid Protocol</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        table, th, td {
+            border: 1px solid black;
+        }
+        th, td {
+            padding: 10px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <h1>Sealed Bid Protocol Results</h1>
+    <table id="resultsTable">
+        <thead>
+            <tr>
+                <th>Player</th>
+                <th>Total Bids</th>
+                <th>Fair Share</th>
+                <th>Allocated Items</th>
+                <th>Allocated Value</th>
+                <th>Difference</th>
+                <th>Surplus Share</th>
+                <th>Cash</th>
+                <th>Net Total</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+    <script>
+        function sealedBidProtocol(bids) {
+
+            const playerNames = JSON.parse(localStorage.getItem('playerNames')) || [];
+            const itemNames = JSON.parse(localStorage.getItem('itemNames')) || [];
+
+            const numPlayers = bids.length;
+            const numItems = bids[0].length;
+
+            const totalBids = bids.map(playerBids => playerBids.reduce((a, b) => a + b, 0));
+            const totalBidAmount = totalBids.reduce((a, b) => a + b, 0);
+            const fairShare = totalBids.map(total => total / numPlayers);
+
+            const allocation = Array(numPlayers).fill(null).map(() => []);
+            const allocated = Array(numItems).fill(false);
+
+            for (let item = 0; item < numItems; item++) {
+                let maxBid = -1;
+                let maxBidder = -1;
+
+                for (let player = 0; player < numPlayers; player++) {
+                    if (!allocated[item] && bids[player][item] > maxBid) {
+                        maxBid = bids[player][item];
+                        maxBidder = player;
+                    }
+                }
+
+                if (maxBidder !== -1) {
+                    allocation[maxBidder].push(item);
+                    allocated[item] = true;
+                }
+            }
+
+            const allocatedValue = allocation.map(playerItems => playerItems.reduce((sum, item) => sum + bids[allocation.indexOf(playerItems)][item], 0));
+            const differences = allocatedValue.map((value, i) => fairShare[i] - value);
+            const totalSurplus = differences.reduce((a, b) => a + b, 0);
+            const surplusShare = totalSurplus / numPlayers;
+
+            const finalAllocation = allocation.map((playerItems, i) => {
+                const itemValue = allocatedValue[i];
+                const cash = differences[i] - surplusShare;
+                return {
+                    items: playerItems,
+                    itemsValue: itemValue,
+                    cash: cash,
+                    netTotal: itemValue + cash
+                };
+            });
+
+            return {
+                playerNames,
+                itemNames,
+                totalBids,
+                fairShare,
+                allocation,
+                allocatedValue,
+                differences,
+                totalSurplus,
+                surplusShare,
+                finalAllocation
+            };
+        }
+        
+        
+        const bids = JSON.parse(localStorage.getItem('playerData')) || [];
+
+        // console.log(localStorage.getItem('playerData'));
+
+        const results = sealedBidProtocol(bids);
+
+        function displayResults(results) {
+            const tableBody = document.getElementById('resultsTable').querySelector('tbody');
+            tableBody.innerHTML = '';
+            for (let i = 0; i < results.finalAllocation.length; i++) {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>Player ${i + 1}</td>
+                    <td>${results.totalBids[i]}</td>
+                    <td>${results.fairShare[i].toFixed(2)}</td>
+                    <td>${results.allocation[i].join(', ')}</td>
+                    <td>${results.allocatedValue[i]}</td>
+                    <td>${results.differences[i].toFixed(2)}</td>
+                    <td>${results.surplusShare.toFixed(2)}</td>
+                    <td>${results.finalAllocation[i].cash.toFixed(2)}</td>
+                    <td>${results.finalAllocation[i].netTotal.toFixed(2)}</td>
+                `;
+                tableBody.appendChild(row);
+            }
+        }
+
+        displayResults(results);
+    </script>
+</body>
+</html>

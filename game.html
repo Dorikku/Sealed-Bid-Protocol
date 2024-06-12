@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Player Turn</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Player <span id="currentPlayerName"></span>'s Turn</h1>
+        <form id="inputForm">
+            <div id="itemInputs"></div>
+            <button type="submit">Submit</button>
+        </form>
+    </div>
+
+    <script>
+        const numPlayers = parseInt(localStorage.getItem('numPlayers'));
+        const numItems = parseInt(localStorage.getItem('numItems'));
+        const playerNames = JSON.parse(localStorage.getItem('playerNames'));
+        const itemNames = JSON.parse(localStorage.getItem('itemNames'));
+
+        let currentPlayer = parseInt(localStorage.getItem('currentPlayer')) || 1;
+        let playerData = JSON.parse(localStorage.getItem('playerData')) || [];
+
+        document.getElementById('currentPlayerName').textContent = playerNames[currentPlayer - 1];
+
+        const itemInputsDiv = document.getElementById('itemInputs');
+        itemNames.forEach((itemName, index) => {
+            const label = document.createElement('label');
+            label.for = 'item' + index;
+            label.textContent = itemName + ':';
+            itemInputsDiv.appendChild(label);
+
+            const input = document.createElement('input');
+            input.type = 'number';
+            input.id = 'item' + index;
+            input.name = 'item' + index;
+            input.required = true;
+            itemInputsDiv.appendChild(input);
+
+            itemInputsDiv.appendChild(document.createElement('br'));
+            itemInputsDiv.appendChild(document.createElement('br'));
+        });
+
+        document.getElementById('inputForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const playerInputs = [];
+            itemNames.forEach((_, index) => {
+                const input = parseInt(document.getElementById('item' + index).value, 10);
+                playerInputs.push(input);
+            });
+
+            playerData[currentPlayer - 1] = playerInputs;
+            localStorage.setItem('playerData', JSON.stringify(playerData));
+
+            if (currentPlayer < numPlayers) {
+                currentPlayer++;
+                localStorage.setItem('currentPlayer', currentPlayer);
+                window.location.reload();
+            } else {
+                localStorage.removeItem('currentPlayer');
+                window.location.href = 'results.html';
+            }
+        });
+    </script>
+</body>
+</html>
