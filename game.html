@@ -4,25 +4,37 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Player Turn</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-        }
-        .container {
-            max-width: 600px;
-            margin: 0 auto;
-            padding: 20px;
-            text-align: center;
-        }
-    </style>
+    <link rel="stylesheet" href="styles2.css">
 </head>
 <body>
-    <div class="container">
-        <h1>Player <span id="currentPlayerName"></span>'s Turn</h1>
-        <form id="inputForm">
-            <div id="itemInputs"></div>
-            <button type="submit">Submit</button>
-        </form>
+    <div class="main-container">
+        <div class="content">
+            <div class="logo">
+                <img src="static/pictures/splitify.png" alt="Logo">
+            </div>
+            <h3>Fair Shares for Everyone, Every Time.</h3>
+            <section class="container">
+                <main>
+                    <div class="main-wrap">
+                        <div class="form-container">
+                            <h1>Player <span id="currentPlayerName"></span>'s Turn</h1>
+                            <div class="wrap-title">
+                                <p>Place your bid on each item</p>
+                            </div>                            
+                            <form id="inputForm">
+                                <div class="input-divide">
+                                    <div class="input-container">
+                                        <div id="itemInputs"></div>
+                                        <button type="submit" class="submit-btn">Submit</button>
+                                        <!-- <div id="numPlayersError" class="error-message"></div> -->
+                                    </div>
+                                </div>
+                            </form>                            
+                        </div>
+                    </div>
+                </main>
+            </section>
+        </div>
     </div>
 
     <script>
@@ -47,10 +59,10 @@
             input.type = 'number';
             input.id = 'item' + index;
             input.name = 'item' + index;
+            input.placeholder = 'Bid for ' + itemName + '...';
             input.required = true;
             itemInputsDiv.appendChild(input);
 
-            itemInputsDiv.appendChild(document.createElement('br'));
             itemInputsDiv.appendChild(document.createElement('br'));
         });
 

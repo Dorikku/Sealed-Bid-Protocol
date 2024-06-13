@@ -4,39 +4,93 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sealed Bid Protocol</title>
-    <style>
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 20px 0;
-        }
-        table, th, td {
-            border: 1px solid black;
-        }
-        th, td {
-            padding: 10px;
-            text-align: center;
-        }
-    </style>
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <link rel="stylesheet" href="styles3.css">
 </head>
 <body>
-    <h1>Sealed Bid Protocol Results</h1>
-    <table id="resultsTable">
-        <thead>
-            <tr>
-                <th>Player</th>
-                <th>Total Bids</th>
-                <th>Fair Share</th>
-                <th>Allocated Items</th>
-                <th>Allocated Value</th>
-                <th>Difference</th>
-                <th>Surplus Share</th>
-                <th>Cash</th>
-                <th>Net Total</th>
-            </tr>
-        </thead>
-        <tbody></tbody>
-    </table>
+    <header>
+        <nav>
+            <div class="logo">
+                <img src="static/pictures/splitify.png" alt="Logo">
+            </div>
+            <div class="nav__container">
+                <button type="submit" class="newbid__button" onclick="window.location.href='index.html'"><i class='bx bxs-plus-circle bx-tada-hover' ></i>New Bid</button>
+            </div>
+        </nav>
+    </header>
+    <div class="main-container">
+        <div class="content">
+            <main>
+                <section class="hero">
+                    <div class="hero__img">
+                        <img src="static/pictures/hero_image.png" alt="Search IMG">
+                    </div>
+                    <div>
+                        <div class="hero__text">
+                            <h1>Results are in!</h1>
+                            <p>Let's review the results</p>
+                        </div>
+                        <div class="hero__text2">
+                            <p>Let's go!</p>
+                            <button class="scroll-btn" onclick="scrollDown()">
+                                <i class='bx bxs-chevrons-down'></i>
+                            </button>
+                        </div>
+                    </div>                    
+                </section>
+            </main>
+
+            <div class="result-list" id="resultList">
+                <h2>Bidding Results</h2>
+                <div class="result-header">
+                    <div class="result-info">
+                        <div>
+                            <label>Player</label>
+                        </div>
+                        <div>
+                            <label>Name</label>
+                        </div>
+                        <div>
+                            <label>Items Won</label>
+                        </div>
+                        <div>
+                            <label>Cash to Pay/Earn</label>
+                        </div>
+                        <div>
+                            <label>Net Total</label>
+                        </div>                        
+                    </div>
+                </div>
+            </div>
+            <div class="button-container">
+                <button type="button" class="list-btn" onclick="showTable()"><i class='bx bx-list-ul bx-tada-hover'></i>View Full Details</button>
+            </div>
+            <div id="tableContainer" class="table-container">
+                <h2>Sealed Bid Details</h2>
+                <table id="resultsTable">
+                    <thead>
+                        <tr>
+                            <th>Player</th>
+                            <th>Total Bids</th>
+                            <th>Fair Share</th>
+                            <th>Allocated Items</th>
+                            <th>Allocated Value</th>
+                            <th>Difference</th>
+                            <th>Surplus Share</th>
+                            <th>Cash to Pay/Earn</th>
+                            <th>Net Total</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+                <div class="button-container">
+                    <button type="submit" class="newbid__button2" onclick="window.location.href='index.html'"><i class='bx bxs-plus-circle bx-tada-hover' ></i>New Bid</button>
+                </div>
+            </div>
+        </div>   
+    </div>
+    
+    
     <script>
         function sealedBidProtocol(bids) {
 
@@ -110,24 +164,77 @@
         function displayResults(results) {
             const tableBody = document.getElementById('resultsTable').querySelector('tbody');
             tableBody.innerHTML = '';
-            for (let i = 0; i < results.finalAllocation.length; i++) {
+
+            results.finalAllocation.forEach((allocation, i) => {
+                // Ensure the items are correctly mapped to names
+                const itemNames = allocation.items.map(item => results.itemNames[item]);
+
                 const row = document.createElement('tr');
                 row.innerHTML = `
-                    <td>Player ${i + 1}</td>
+                    <td>${results.playerNames[i]}</td>
                     <td>${results.totalBids[i]}</td>
                     <td>${results.fairShare[i].toFixed(2)}</td>
-                    <td>${results.allocation[i].join(', ')}</td>
+                    <td>${itemNames.join(', ')}</td>
                     <td>${results.allocatedValue[i]}</td>
                     <td>${results.differences[i].toFixed(2)}</td>
                     <td>${results.surplusShare.toFixed(2)}</td>
-                    <td>${results.finalAllocation[i].cash.toFixed(2)}</td>
-                    <td>${results.finalAllocation[i].netTotal.toFixed(2)}</td>
+                    <td>${allocation.cash.toFixed(2)}</td>
+                    <td>${allocation.netTotal.toFixed(2)}</td>
                 `;
                 tableBody.appendChild(row);
-            }
+            });
+
+            const resultListContainer = document.getElementById('resultList');
+            // Clear only the cards, not the header
+            const cards = resultListContainer.querySelectorAll('.result-card');
+            cards.forEach(card => card.remove());
+
+            results.finalAllocation.forEach((allocation, j) => {
+                // Ensure the items are correctly mapped to names
+                const itemNames = allocation.items.map(item => results.itemNames[item]);
+
+                const resultCard = document.createElement('div');
+                resultCard.classList.add('result-card');
+                resultCard.innerHTML = `
+                    <div class="result-info">
+                        <div>
+                            <img src="static/pictures/profile.png" alt="result Image">
+                        </div>
+                        <div>
+                            <span>${results.playerNames[j]}</span>
+                        </div>
+                        <div>
+                            <span>${itemNames.join(', ')}</span>
+                        </div>
+                        <div>
+                            <span>${allocation.cash.toFixed(2)}</span>
+                        </div>
+                        <div>
+                            <span>${allocation.netTotal.toFixed(2)}</span>
+                        </div>
+                    </div>
+                `;
+                resultListContainer.appendChild(resultCard);
+            });
         }
 
         displayResults(results);
+
+        function scrollDown() {
+            // Scroll down by 500 pixels
+            window.scrollBy(0, 500);
+        }
+
+        function showTable(bookID, bookTitle) {            
+            const tableContainer = document.getElementById("tableContainer");
+            if (tableContainer.style.display === "block") {
+                tableContainer.style.display = "none";
+            } else {
+                tableContainer.style.display = "block";
+                window.scrollBy(0, 500);
+            }
+        }
+
     </script>
 </body>
 </html>
